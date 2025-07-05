@@ -164,6 +164,91 @@ class DashboardAPI:
                 'database': 'connected' if db_healthy else 'disconnected',
                 'timestamp': datetime.utcnow().isoformat()
             }
+        
+        @self.app.post("/api/scrape")
+        async def trigger_scrape(
+            parks: str = Query(default="all"),
+            days: int = Query(default=7)
+        ):
+            """Trigger a manual scrape of campsite availability."""
+            try:
+                from ..scraper.crawl4ai_client import Crawl4AIClient
+                from ..config.parks import get_all_parks
+                from ..database.models import CampsiteSearchQuery
+                
+                # Determine parks to scrape
+                if parks == "all":
+                    park_list = get_all_parks()
+                else:
+                    park_names = parks.split(",")
+                    park_list = [ParkEnum(name.strip()) for name in park_names]
+                
+                # Setup clients
+                async with Crawl4AIClient() as scraper:
+                    
+                    # Check MCP server connectivity
+                    crawl_healthy = await scraper.health_check()
+                    if not crawl_healthy:
+                        return {
+                            'status': 'error',
+                            'message': 'Crawl4AI MCP server not available',
+                            'timestamp': datetime.utcnow().isoformat()
+                        }
+                    
+                    # Create search query
+                    start_date = date.today()
+                    end_date = start_date + timedelta(days=days)
+                    
+                    query = CampsiteSearchQuery(
+                        parks=park_list,
+                        start_date=start_date,
+                        end_date=end_date
+                    )
+                    
+                    results = []
+                    # Scrape each park
+                    for park in park_list:
+                        try:
+                            park_availability = await scraper.scrape_park_availability(park, query)
+                            
+                            # Store in database
+                            if park_availability:
+                                await self.db_client.store_availability_batch(park_availability)
+                                results.append({
+                                    'park': park.value,
+                                    'sites_found': len(park_availability),
+                                    'status': 'success'
+                                })
+                            else:
+                                results.append({
+                                    'park': park.value,
+                                    'sites_found': 0,
+                                    'status': 'no_data'
+                                })
+                                
+                        except Exception as e:
+                            logger.error(f"Error scraping {park}: {e}")
+                            results.append({
+                                'park': park.value,
+                                'error': str(e),
+                                'status': 'error'
+                            })
+                    
+                    return {
+                        'status': 'completed',
+                        'parks_scraped': len(park_list),
+                        'date_range': f"{start_date} to {end_date}",
+                        'results': results,
+                        'timestamp': datetime.utcnow().isoformat()
+                    }
+                    
+            except Exception as e:
+                logger.error(f"Scraping failed: {e}")
+                return {
+                    'status': 'error',
+                    'message': str(e),
+                    'timestamp': datetime.utcnow().isoformat()
+                }
     
     async def render_calendar_page(
         self,
