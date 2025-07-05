@@ -3,135 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Southern California Campsite Tracker</title>
+    <title>🏕️ SoCal Campsite Hunter</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 30px; }
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 20px; }
-        .calendar-header { background: #2c3e50; color: white; padding: 10px; text-align: center; font-weight: bold; }
-        .calendar-day { background: white; border: 1px solid #ddd; min-height: 100px; padding: 5px; position: relative; }
-        .calendar-day.weekend { background: #f8f9fa; }
-        .calendar-day.has-availability { background: #d4edda; border-color: #c3e6cb; }
-        .calendar-day.weekend.has-availability { background: #d1ecf1; border-color: #bee5eb; }
-        .day-number { font-weight: bold; margin-bottom: 5px; }
-        .availability-count { font-size: 12px; color: #28a745; }
-        .weekend-indicator { font-size: 10px; color: #6c757d; }
-        .stats { display: flex; justify-content: space-around; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 5px; }
-        .stat { flex: 1; }
-        .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
-        .stat-label { font-size: 12px; color: #6c757d; }
-        select, button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background: #007bff; color: white; border-color: #007bff; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; font-size: 12px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .legend-color { width: 15px; height: 15px; border: 1px solid #ddd; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --forest-green: #2d5a27;
+            --desert-sand: #d4a574;
+            --ocean-blue: #4a90a4;
+            --sunset-orange: #e85a4f;
+            --warm-white: #fefefe;
+            --stone-gray: #8b8680;
+            --tent-yellow: #f4c430;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--ocean-blue) 100%);
+            min-height: 100vh;
+            color: var(--warm-white);
+        }
+        
+        .hero-section {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(45, 90, 39, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--tent-yellow), var(--desert-sand));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .quick-finder {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--forest-green);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .finder-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .park-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .park-card {
+            background: linear-gradient(135deg, var(--forest-green), var(--ocean-blue));
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .park-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: var(--tent-yellow);
+        }
+        
+        .park-card.selected {
+            border-color: var(--sunset-orange);
+            transform: scale(1.05);
+        }
+        
+        .park-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .park-stats {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .next-available {
+            background: var(--tent-yellow);
+            color: var(--forest-green);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+        
+        .availability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .availability-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--forest-green);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border-left: 5px solid var(--sunset-orange);
+        }
+        
+        .date-badge {
+            background: var(--forest-green);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .weekend-badge {
+            background: var(--sunset-orange);
+        }
+        
+        .site-info {
+            margin: 1rem 0;
+        }
+        
+        .price-tag {
+            background: var(--tent-yellow);
+            color: var(--forest-green);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--sunset-orange);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(232, 90, 79, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(232, 90, 79, 0.6);
+        }
+        
+        .status-bar {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+        
+        .loading {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--stone-gray);
+        }
+        
+        .alert {
+            background: var(--sunset-orange);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏕️ Southern California Campsite Tracker</h1>
-            <p>Monitor availability across Joshua Tree, Carlsbad, and Oceanside</p>
-        </div>
+    <div class="status-bar">
+        <span id="status">🔄 Last updated: {{ timestamp or 'Loading...' }}</span>
+        <span style="float: right;">
+            📍 Monitoring: Joshua Tree • Carlsbad • Oceanside
+        </span>
+    </div>
+
+    <div class="hero-section">
+        <h1 class="hero-title">SoCal Campsite Hunter</h1>
+        <p class="hero-subtitle">Find your perfect camping spot before anyone else</p>
+    </div>
+
+    <div class="quick-finder">
+        <h2 class="finder-title">🎯 Next Available Spots</h2>
         
-        <div class="controls">
-            <div>
-                <select id="parkSelect">
-                    <option value="all">All Parks</option>
-                    {% for park in park_options %}
-                    <option value="{{ park.value }}" {% if park.selected %}selected{% endif %}>{{ park.name }}</option>
-                    {% endfor %}
-                </select>
-                
-                <select id="monthSelect">
-                    {% for i in range(12) %}
-                    <option value="{{ i + 1 }}" {% if (i + 1) == current_month %}selected{% endif %}>
-                        {{ month_names[i] }}
-                    </option>
-                    {% endfor %}
-                </select>
-                
-                <select id="yearSelect">
-                    {% for year in range(2024, 2026) %}
-                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
-                    {% endfor %}
-                </select>
-                
-                <button onclick="updateCalendar()">Update</button>
+        <div class="park-cards">
+            <div class="park-card" data-park="carlsbad" onclick="selectPark('carlsbad')">
+                <div class="park-name">🏖️ South Carlsbad State Beach</div>
+                <div class="park-stats" id="carlsbad-stats">Checking availability...</div>
             </div>
             
-            <div>
-                <button onclick="window.location.reload()">Refresh Data</button>
+            <div class="park-card" data-park="joshua_tree" onclick="selectPark('joshua_tree')">
+                <div class="park-name">🌵 Joshua Tree National Park</div>
+                <div class="park-stats" id="joshua-stats">Checking availability...</div>
             </div>
-        </div>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-number">{{ calendar_data.total_available }}</div>
-                <div class="stat-label">Total Available</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">{{ calendar_data.weekend_available }}</div>
-                <div class="stat-label">Weekend Available</div>
-            </div>
-            <div class="stat">
-                <div class="stat-number">{{ calendar_data.days|length }}</div>
-                <div class="stat-label">Days in Month</div>
-            </div>
-        </div>
-        
-        <div class="calendar">
-            <div class="calendar-header">Sun</div>
-            <div class="calendar-header">Mon</div>
-            <div class="calendar-header">Tue</div>
-            <div class="calendar-header">Wed</div>
-            <div class="calendar-header">Thu</div>
-            <div class="calendar-header">Fri</div>
-            <div class="calendar-header">Sat</div>
             
-            {% for day in calendar_data.days %}
-            <div class="calendar-day {% if day.weekend %}weekend{% endif %} {% if day.available_count > 0 %}has-availability{% endif %}">
-                <div class="day-number">{{ day.date.day }}</div>
-                {% if day.available_count > 0 %}
-                <div class="availability-count">{{ day.available_count }} available</div>
-                {% if day.min_price %}
-                <div class="availability-count">from ${{ "%.0f"|format(day.min_price) }}</div>
-                {% endif %}
-                {% endif %}
-                {% if day.weekend %}
-                <div class="weekend-indicator">Weekend</div>
-                {% endif %}
+            <div class="park-card" data-park="oceanside" onclick="selectPark('oceanside')">
+                <div class="park-name">🌊 Oceanside</div>
+                <div class="park-stats" id="oceanside-stats">Checking availability...</div>
             </div>
-            {% endfor %}
         </div>
         
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: white;"></div>
-                <span>No availability</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #d4edda;"></div>
-                <span>Weekday availability</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #d1ecf1;"></div>
-                <span>Weekend availability</span>
-            </div>
+        <div class="alert" id="demo-alert">
+            ⚠️ Demo Mode: This is showing sample data. Real scraping will provide live availability from ReserveCalifornia.com
         </div>
     </div>
-    
+
+    <div class="availability-grid" id="availability-results">
+        <!-- Sample data for South Carlsbad State Beach -->
+        <div class="availability-card">
+            <div class="date-badge weekend-badge">Jul 12-13, 2025 (Weekend)</div>
+            <div class="site-info">
+                <h3>🏖️ South Carlsbad State Beach</h3>
+                <p><strong>Site:</strong> Beachfront Site #47</p>
+                <p><strong>Type:</strong> RV/Tent • Full Hookups</p>
+                <p><strong>Distance to beach:</strong> 50 yards</p>
+            </div>
+            <div class="price-tag">$65/night</div>
+        </div>
+        
+        <div class="availability-card">
+            <div class="date-badge">Jul 15, 2025 (Monday)</div>
+            <div class="site-info">
+                <h3>🏖️ South Carlsbad State Beach</h3>
+                <p><strong>Site:</strong> Oceanview Site #23</p>
+                <p><strong>Type:</strong> RV/Tent • Partial Hookups</p>
+                <p><strong>Distance to beach:</strong> 100 yards</p>
+            </div>
+            <div class="price-tag">$55/night</div>
+        </div>
+        
+        <div class="availability-card">
+            <div class="date-badge weekend-badge">Jul 19-20, 2025 (Weekend)</div>
+            <div class="site-info">
+                <h3>🌵 Joshua Tree National Park</h3>
+                <p><strong>Site:</strong> Jumbo Rocks #15</p>
+                <p><strong>Type:</strong> Tent Only • Desert Views</p>
+                <p><strong>Amenities:</strong> Fire ring, picnic table</p>
+            </div>
+            <div class="price-tag">$35/night</div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshData()">
+        🔄 Check for New Spots
+    </button>
+
     <script>
-        function updateCalendar() {
-            const park = document.getElementById('parkSelect').value;
-            const month = document.getElementById('monthSelect').value;
-            const year = document.getElementById('yearSelect').value;
+        let selectedPark = 'carlsbad';
+        
+        function selectPark(park) {
+            // Remove previous selection
+            document.querySelectorAll('.park-card').forEach(card => {
+                card.classList.remove('selected');
+            });
             
-            window.location.href = `/calendar?year=${year}&month=${month}&park=${park}`;
+            // Select new park
+            document.querySelector(`[data-park="${park}"]`).classList.add('selected');
+            selectedPark = park;
+            
+            // Update results
+            updateAvailabilityResults(park);
         }
+        
+        function updateAvailabilityResults(park) {
+            const results = document.getElementById('availability-results');
+            results.innerHTML = '<div class="loading">🔄 Loading availability for ' + park.replace('_', ' ') + '...</div>';
+            
+            // Simulate API call - in production this would fetch real data
+            setTimeout(() => {
+                if (park === 'carlsbad') {
+                    results.innerHTML = `
+                        <div class="availability-card">
+                            <div class="date-badge weekend-badge">Next Weekend: Jul 19-20</div>
+                            <div class="site-info">
+                                <h3>🏖️ South Carlsbad State Beach</h3>
+                                <p><strong>Site:</strong> Premium Beachfront #12</p>
+                                <p><strong>Type:</strong> RV/Tent • Full Hookups</p>
+                                <p><strong>Special:</strong> Direct beach access</p>
+                            </div>
+                            <div class="price-tag">$75/night</div>
+                        </div>
+                        <div class="availability-card">
+                            <div class="date-badge">Tomorrow: Jul 6</div>
+                            <div class="site-info">
+                                <h3>🏖️ South Carlsbad State Beach</h3>
+                                <p><strong>Site:</strong> Standard Site #45</p>
+                                <p><strong>Type:</strong> Tent • Partial Hookups</p>
+                                <p><strong>Walk to beach:</strong> 2 minutes</p>
+                            </div>
+                            <div class="price-tag">$55/night</div>
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = '<div class="no-data">No availability found for ' + park.replace('_', ' ') + ' in the next 30 days 😞</div>';
+                }
+            }, 1000);
+        }
+        
+        function refreshData() {
+            document.getElementById('status').innerHTML = '🔄 Refreshing data...';
+            
+            // In production, this would trigger the scraper
+            setTimeout(() => {
+                const now = new Date().toLocaleString();
+                document.getElementById('status').innerHTML = `✅ Last updated: ${now}`;
+                updateAvailabilityResults(selectedPark);
+            }, 2000);
+        }
+        
+        // Initialize with Carlsbad selected
+        document.addEventListener('DOMContentLoaded', () => {
+            selectPark('carlsbad');
+            
+            // Update stats
+            setTimeout(() => {
+                document.getElementById('carlsbad-stats').innerHTML = '3 spots this week • 1 weekend available';
+                document.getElementById('joshua-stats').innerHTML = '5 spots this week • 2 weekends available';
+                document.getElementById('oceanside-stats').innerHTML = '1 spot this week • No weekends';
+            }, 1000);
+        });
+        
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            refreshData();
+        }, 5 * 60 * 1000);
     </script>
 </body>
 </html>
