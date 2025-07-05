@@ -1,0 +1,7 @@
+127.0.0.1 - - [03/Jul/2025 18:35:14] "GET /demo.html HTTP/1.1" 200 -
+127.0.0.1 - - [03/Jul/2025 18:38:15] "GET /demo.html HTTP/1.1" 200 -
+127.0.0.1 - - [03/Jul/2025 18:38:17] code 404, message File not found
+127.0.0.1 - - [03/Jul/2025 18:38:17] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [03/Jul/2025 19:02:07] "GET /demo.html HTTP/1.1" 200 -
+127.0.0.1 - - [03/Jul/2025 19:13:40] "GET /demo.html HTTP/1.1" 304 -
+127.0.0.1 - - [03/Jul/2025 22:26:09] "HEAD /demo.html HTTP/1.1" 200 -

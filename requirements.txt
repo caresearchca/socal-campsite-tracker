@@ -1,0 +1,54 @@
+# Core Dependencies
+python-dotenv>=1.0.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+asyncio-throttle>=1.0.2
+httpx>=0.27.0
+aiofiles>=24.1.0
+
+# MCP Client Dependencies
+mcp>=1.0.0
+
+# Database Dependencies (Supabase/PostgreSQL)
+asyncpg>=0.29.0
+supabase>=2.7.0
+
+# Email Dependencies
+aiosmtplib>=3.0.0
+jinja2>=3.1.4
+
+# Web Framework for Dashboard
+fastapi>=0.111.0
+uvicorn>=0.30.0
+jinja2>=3.1.4
+python-multipart>=0.0.6
+
+# Scheduling and Async
+schedule>=1.2.2
+apscheduler>=3.10.4
+
+# Data Processing
+pandas>=2.2.0
+numpy>=2.0.0
+
+# Logging and Monitoring
+structlog>=24.2.0
+prometheus-client>=0.20.0
+
+# Testing Dependencies
+pytest>=8.3.0
+pytest-asyncio>=0.23.8
+pytest-cov>=5.0.0
+pytest-mock>=3.14.0
+httpx>=0.27.0  # For testing async HTTP calls
+
+# Development Dependencies
+black>=24.4.2
+ruff>=0.5.5
+mypy>=1.11.0
+pre-commit>=3.8.0
+
+# Utility Dependencies
+click>=8.1.7
+rich>=13.7.1
+tabulate>=0.9.0

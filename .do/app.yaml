@@ -1,0 +1,68 @@
+name: socal-campsite-tracker
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: caresearchca/socal-campsite-tracker
+    branch: main
+    deploy_on_push: true
+  run_command: python -m uvicorn src.main:app --host 0.0.0.0 --port $PORT
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  envs:
+  - key: CRAWL4AI_MCP_URL
+    value: http://localhost:8051/sse
+    type: SECRET
+  - key: SUPABASE_PROJECT_REF
+    value: gzkxecewlnfnnoutmcuu
+    type: SECRET
+  - key: SUPABASE_ACCESS_TOKEN
+    value: ${SUPABASE_ACCESS_TOKEN}
+    type: SECRET
+  - key: GITHUB_PERSONAL_ACCESS_TOKEN
+    value: ${GITHUB_PERSONAL_ACCESS_TOKEN}
+    type: SECRET
+  - key: DIGITALOCEAN_API_TOKEN
+    value: ${DIGITALOCEAN_API_TOKEN}
+    type: SECRET
+  - key: NOTIFICATION_EMAIL
+    value: ${NOTIFICATION_EMAIL}
+    type: SECRET
+  - key: SMTP_USERNAME
+    value: ${SMTP_USERNAME}
+    type: SECRET
+  - key: SMTP_PASSWORD
+    value: ${SMTP_PASSWORD}
+    type: SECRET
+  - key: SECRET_KEY
+    value: ${SECRET_KEY}
+    type: SECRET
+  - key: DEBUG
+    value: "false"
+  - key: LOG_LEVEL
+    value: "INFO"
+  health_check:
+    http_path: /health
+workers:
+- name: scraper
+  source_dir: /
+  github:
+    repo: caresearchca/socal-campsite-tracker
+    branch: main
+    deploy_on_push: true
+  run_command: python -m src.main worker
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: CRAWL4AI_MCP_URL
+    value: http://localhost:8051/sse
+    type: SECRET
+  - key: SUPABASE_PROJECT_REF
+    value: gzkxecewlnfnnoutmcuu
+    type: SECRET
+  - key: SUPABASE_ACCESS_TOKEN
+    value: ${SUPABASE_ACCESS_TOKEN}
+    type: SECRET
