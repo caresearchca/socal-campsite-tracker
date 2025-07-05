@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Southern California Campsite Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 20px; }
+        .calendar-header { background: #2c3e50; color: white; padding: 10px; text-align: center; font-weight: bold; }
+        .calendar-day { background: white; border: 1px solid #ddd; min-height: 100px; padding: 5px; position: relative; }
+        .calendar-day.weekend { background: #f8f9fa; }
+        .calendar-day.has-availability { background: #d4edda; border-color: #c3e6cb; }
+        .calendar-day.weekend.has-availability { background: #d1ecf1; border-color: #bee5eb; }
+        .day-number { font-weight: bold; margin-bottom: 5px; }
+        .availability-count { font-size: 12px; color: #28a745; }
+        .weekend-indicator { font-size: 10px; color: #6c757d; }
+        .stats { display: flex; justify-content: space-around; text-align: center; background: #f8f9fa; padding: 15px; border-radius: 5px; }
+        .stat { flex: 1; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .stat-label { font-size: 12px; color: #6c757d; }
+        select, button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; border-color: #007bff; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 15px; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 15px; height: 15px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏕️ Southern California Campsite Tracker</h1>
+            <p>Monitor availability across Joshua Tree, Carlsbad, and Oceanside</p>
+        </div>
+        
+        <div class="controls">
+            <div>
+                <select id="parkSelect">
+                    <option value="all">All Parks</option>
+                    {% for park in park_options %}
+                    <option value="{{ park.value }}" {% if park.selected %}selected{% endif %}>{{ park.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <select id="monthSelect">
+                    {% for i in range(12) %}
+                    <option value="{{ i + 1 }}" {% if (i + 1) == current_month %}selected{% endif %}>
+                        {{ month_names[i] }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                <select id="yearSelect">
+                    {% for year in range(2024, 2026) %}
+                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button onclick="updateCalendar()">Update</button>
+            </div>
+            
+            <div>
+                <button onclick="window.location.reload()">Refresh Data</button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">{{ calendar_data.total_available }}</div>
+                <div class="stat-label">Total Available</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">{{ calendar_data.weekend_available }}</div>
+                <div class="stat-label">Weekend Available</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">{{ calendar_data.days|length }}</div>
+                <div class="stat-label">Days in Month</div>
+            </div>
+        </div>
+        
+        <div class="calendar">
+            <div class="calendar-header">Sun</div>
+            <div class="calendar-header">Mon</div>
+            <div class="calendar-header">Tue</div>
+            <div class="calendar-header">Wed</div>
+            <div class="calendar-header">Thu</div>
+            <div class="calendar-header">Fri</div>
+            <div class="calendar-header">Sat</div>
+            
+            {% for day in calendar_data.days %}
+            <div class="calendar-day {% if day.weekend %}weekend{% endif %} {% if day.available_count > 0 %}has-availability{% endif %}">
+                <div class="day-number">{{ day.date.day }}</div>
+                {% if day.available_count > 0 %}
+                <div class="availability-count">{{ day.available_count }} available</div>
+                {% if day.min_price %}
+                <div class="availability-count">from ${{ "%.0f"|format(day.min_price) }}</div>
+                {% endif %}
+                {% endif %}
+                {% if day.weekend %}
+                <div class="weekend-indicator">Weekend</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: white;"></div>
+                <span>No availability</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #d4edda;"></div>
+                <span>Weekday availability</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #d1ecf1;"></div>
+                <span>Weekend availability</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateCalendar() {
+            const park = document.getElementById('parkSelect').value;
+            const month = document.getElementById('monthSelect').value;
+            const year = document.getElementById('yearSelect').value;
+            
+            window.location.href = `/calendar?year=${year}&month=${month}&park=${park}`;
+        }
+    </script>
+</body>
+</html>
